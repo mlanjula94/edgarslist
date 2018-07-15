@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
 const passport = require('passport');
+var formidable = require('formidable');
+var cloudinary = require('cloudinary');
+
+require('dotenv').config();
 
 //Load Input Vaidation
 const validateRegisterInput = require("../../validation/register");
@@ -12,6 +15,13 @@ const validateLoginInput = require("../../validation/login");
 
 //Load User model
 const User = require('../../models/User');
+
+//Cloudinary configeration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // @route GET api/users/test
 // @desc  Tests users route
@@ -23,7 +33,6 @@ router.get("/test", (req, res) => res.json({ msg: "Users Works" }));
 // @access Public
 router.post('/register', (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
-
   //Check Validation
   if (!isValid) {
     return res.status(400).json(errors);
@@ -34,29 +43,59 @@ router.post('/register', (req, res) => {
       if (user) {
         return res.status(400).json({ email: "Email already exists" })
       } else {
-        const avatar = gravatar.url(req.body.email, {
-          s: '200', // Size
-          r: 'pg', // Rating 
-          d: 'mm' // Default
+        // Create a new instance of formidable to handle the request info
+        var form = new formidable.IncomingForm();
+
+        // parse information for form fields and incoming files
+        form.parse(req, function (err, fields, files) {
+          console.log(fields);
+          console.log(files.photo);
+
+          if (files.photo) {
+            // upload file to cloudinary, which'll return an object for the new image
+            cloudinary.uploader.upload(files.photo.path, function (result) {
+              console.log(JSON.stringify(result));
+
+              const newUser = new User({
+                name: fields.name,
+                email: fields.email,
+                avatar: result.secure_url,
+                password: fields.password
+              });
+
+              bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(newUser.password, salt, (err, hash) => {
+                  if (err) throw err;
+                  newUser.password = hash;
+                  newUser
+                    .save()
+                    .then(user => res.json(user))
+                    .catch(err => console.log(err));
+                })
+              })
+            })
+          }
+          else {
+            const newUser = new User({
+              name: fields.name,
+              email: fields.email,
+              password: fields.password
+            });
+
+            bcrypt.genSalt(10, (err, salt) => {
+              bcrypt.hash(newUser.password, salt, (err, hash) => {
+                if (err) throw err;
+                newUser.password = hash;
+                newUser
+                  .save()
+                  .then(user => res.json(user))
+                  .catch(err => console.log(err));
+              })
+            })
+          }
         });
 
-        const newUser = new User({
-          name: req.body.name,
-          email: req.body.email,
-          avatar,
-          password: req.body.password
-        });
 
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            newUser
-              .save()
-              .then(user => res.json(user))
-              .catch(err => console.log(err));
-          })
-        })
       }
     })
 });

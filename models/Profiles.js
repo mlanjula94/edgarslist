@@ -12,9 +12,6 @@ const ProfileSchema = new Schema({
     required: true,
     max: 40
   },
-  website: {
-    type: String
-  },
   location: {
     type: String
   },
