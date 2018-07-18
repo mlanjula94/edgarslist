@@ -33,72 +33,39 @@ router.get("/test", (req, res) => res.json({ msg: "Users Works" }));
 // @access Public
 router.post('/register', (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
-  //Check Validation
+
+  // Check Validation
   if (!isValid) {
     return res.status(400).json(errors);
   }
 
-  User.findOne({ email: req.body.email })
-    .then(user => {
-      if (user) {
-        return res.status(400).json({ email: "Email already exists" })
-      } else {
-        // Create a new instance of formidable to handle the request info
-        var form = new formidable.IncomingForm();
+  User.findOne({ email: req.body.email }).then(user => {
+    if (user) {
+      errors.email = 'Email already exists';
+      return res.status(400).json(errors);
+    } else {
 
-        // parse information for form fields and incoming files
-        form.parse(req, function (err, fields, files) {
-          console.log(fields);
-          console.log(files.photo);
+      const newUser = new User({
+        name: req.body.name,
+        email: req.body.email,
+        avatar: "http://www.personalbrandingblog.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640-300x300.png",
+        password: req.body.password
+      });
 
-          if (files.photo) {
-            // upload file to cloudinary, which'll return an object for the new image
-            cloudinary.uploader.upload(files.photo.path, function (result) {
-              console.log(JSON.stringify(result));
-
-              const newUser = new User({
-                name: fields.name,
-                email: fields.email,
-                avatar: result.secure_url,
-                password: fields.password
-              });
-
-              bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(newUser.password, salt, (err, hash) => {
-                  if (err) throw err;
-                  newUser.password = hash;
-                  newUser
-                    .save()
-                    .then(user => res.json(user))
-                    .catch(err => console.log(err));
-                })
-              })
-            })
-          }
-          else {
-            const newUser = new User({
-              name: fields.name,
-              email: fields.email,
-              password: fields.password
-            });
-
-            bcrypt.genSalt(10, (err, salt) => {
-              bcrypt.hash(newUser.password, salt, (err, hash) => {
-                if (err) throw err;
-                newUser.password = hash;
-                newUser
-                  .save()
-                  .then(user => res.json(user))
-                  .catch(err => console.log(err));
-              })
-            })
-          }
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          if (err) throw err;
+          newUser.password = hash;
+          newUser
+            .save()
+            .then(user => res.json(user))
+            .catch(err => console.log(err));
         });
-
-
-      }
-    })
+      });
+    }
+  });
 });
+
 
 // @route GET api/users/login
 // @desc  login User / Returning JWT token 

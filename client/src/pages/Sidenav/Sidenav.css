@@ -1,0 +1,120 @@
+.sidebar {
+  color: #FFF;
+  background: #2b2b2d;
+  border-radius: 10px;
+  width: 250px;
+  /* max-width: 250px; */
+  height: 100%;
+  float: left;
+  /* position: fixed; */
+  z-index: 1000;
+  display: block;
+  -webkit-transition: margin 2s;
+  transition: margin 2s;
+  margin-bottom: 20px;
+flex:1;
+}
+#navbar-toggle {
+  cursor: pointer;
+}
+#toggleView {
+  margin-left: 44px;
+}
+.menu-icon {
+  float: right;
+}
+.sidebar-nav {
+  display: block;
+  float: left;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sidebar-nav li a {
+  padding-left: 20px;
+  font-size: 16px;
+  text-decoration: none;
+  color: #FFF;
+  float: left;
+  text-decoration: none;
+  /* width: 100%; */
+  height: 70px;
+  line-height: 33px;
+  padding: 20px;
+  vertical-align: center;
+  min-width: 170px;
+}
+.sidebar-nav li a:hover {
+  background:#121213;
+  -webkit-transition: background 0.5s;
+  transition: background 0.5s;
+}
+
+.sidebar-nav ul li {
+  display: inline;
+}
+
+.form-control {
+  width: 50%;
+}
+
+.searchField label {
+  padding-left: 20px;
+  font-size: 18px;
+  text-decoration: none;
+  color: #FFF;
+  float: left;
+  text-decoration: none;
+  /* width: 100%; */
+  height: 70px;
+  line-height: 32px;
+  padding: 20px;
+  vertical-align: center;
+}
+
+.searchField input {
+  padding-left: 20px;
+  font-size: 16px;
+  text-decoration: none;
+  color: #FFF;
+  float: left;
+  text-decoration: none;
+  /* width: 100%; */
+  height: 35px;
+  /* line-height: 25px;
+  padding: 20px; */
+  vertical-align: center;
+  margin-top: 17px;
+
+}
+
+.navRow {
+  margin-left: 0px !important;
+  margin-right: 0px;
+}
+
+.addItem {
+  float: right;
+  width: 80% ;
+  margin-left: 9px;
+}
+
+.postItem {
+  float: left;
+  width: 18%;
+}
+
+label {
+  margin-bottom: 0px !important;
+}
+
+.addWidth {
+  width: 30%;
+  float: right;
+}
+
+.form-control {
+  width: 100%;
+}
+
